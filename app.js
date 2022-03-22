@@ -3,13 +3,23 @@ const app = express();
 const path = require('path');
 const mongoose = require('mongoose');
 const engine = require('ejs-mate');
-const Campground = require('./models/campground');
-const catchAsync = require('./utils/catchAsync');
+const Joi = require('joi');
+const session = require('express-session');
+const flash = require('connect-flash');
 const ExpressError = require('./utils/ExpressError');
 const methodOverride = require("method-override");
+const passport = require('passport');
+const LocalStrategy = require('passport-local');
+const User = require('./models/user');
 
+
+const campgroundRouters = require('./routers/campground');
+const reviewRouters = require('./routers/review');
+const userRouters = require('./routers/user')
+const {validateReview, validateCampground } = require('./middleware');
 //kiểm tra kết nối database
 mongoose.connect('mongodb://localhost:27017/yelp-camp');
+
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
@@ -19,57 +29,58 @@ db.once('open', function() {
 app.engine('ejs', engine);
 app.set('view engine','ejs')
 app.set('views', path.join(__dirname,'views'))
+
 //dùng để xuất dữ liệu ra định dạng json
 app.use(express.urlencoded({extended :true}));
 app.use(methodOverride('_method'));
-    
-app.get('/', (req,res) => {
-    res.render('home');
+app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')))
+
+
+const sessionConfig = {
+    secret : 'thatisnotasecret',
+    name: 'session',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        httpOnly: true,
+        // secure: true,
+        expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+        maxAge: 1000 * 60 * 60 * 24 * 7
+    }
+}
+app.use(session(sessionConfig));
+app.use(flash());   
+
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+app.use((req, res, next) => {
+    console.log(req.session)
+    res.locals.currentUser = req.user;
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');
+    next();
 })
+
+app.use('/campgrounds',campgroundRouters);
+app.use('/campgrounds/:id/reviews', reviewRouters )
+app.use('/', userRouters)
 // không cần phải tại dữ liệu vậy mà sẽ dùng mục index
 // app.get('/makecampground', async (req,res) => {
 //     const camp = new Campground({ title: 'MyBackyard', description: 'cheap location' });
 //     await camp.save();
 //     res.send(camp)
 // })
-app.get('/campgrounds', async (req,res) => {
-    const campgrounds = await Campground.find({});
-    res.render('campgrounds/index', {campgrounds});
-})
-app.get('/campgrounds/create', (req,res) => {
-    res.render('campgrounds/create')
-})
-//tạo mới post lên thông tin
-app.post('/campgrounds', catchAsync(async (req, res, next) => {
-    if (!req.body.campground) throw new ExpressError('Invalid Data campground',400)
-    const campground = new Campground(req.body.campground);
-    await campground.save();
-    res.redirect(`/campgrounds/${campground._id}`)
-}))
+app.get('/', (req,res) => {
+    res.render('home');
+});
 
-//chuc nang show
-app.get('/campgrounds/:id', catchAsync(async (req,res,next) => {
-    const campground = await Campground.findById(req.params.id);
-    res.render('campgrounds/show', {campground});
-}))
-//chuc nang edit 
-app.get('/campgrounds/:id/edit', catchAsync( async (req, res) =>{
-    const campground = await Campground.findById(req.params.id);
-    res.render('campgrounds/edit', {campground});
-}));
-//edit
-app.put('/campgrounds/:id', catchAsync(async (req,res) => {
-    const { id } = req.params;
-    const campground = await Campground.findByIdAndUpdate(id, {...req.body.campground});
-    await campground.save();
-    res.redirect(`/campgrounds/${campground._id}`)
-}));
-//delete
-app.delete('/campgrounds/:id', catchAsync(async (req,res) =>{
-    const {id } = req.params;
-    const campground = await Campground.findByIdAndDelete(id, {...req.body.campground});
-    res.redirect('/campgrounds')
-}));
+
 app.all("*",(res,req,next) => {
     next(new ExpressError("Page not found",404));
 })

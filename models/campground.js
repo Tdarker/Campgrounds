@@ -6,7 +6,7 @@ const ImageSchema = new Schema({
     url: String,
     filename: String
 });
-
+const Review = require('./review')
 ImageSchema.virtual('thumbnail').get(function () {
     return this.url.replace('/upload', '/upload/w_200');
 });
@@ -18,8 +18,19 @@ const CampgroundSchema = new Schema({
     images: [ImageSchema],
     price: Number, 
     description : String,
-    location: String 
+    location: String,
+    reviews : [{ type: Schema.Types.ObjectId, ref: 'Review',}] 
 });
+//delete het may cai review trong dbs khi xoa 1 camgpround.
+CampgroundSchema.post("findOneAndDelete", async function(doc){
+    if(doc){
+        await Review.deleteMany({
+            _id : {
+                $in: doc.reviews
+            }
+        })
+    }
+})
 const Campground = mongoose.model('Campground', CampgroundSchema);
 module.exports = Campground;
 
