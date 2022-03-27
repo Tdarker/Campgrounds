@@ -16,7 +16,7 @@ const User = require('./models/user');
 const campgroundRouters = require('./routers/campground');
 const reviewRouters = require('./routers/review');
 const userRouters = require('./routers/user')
-const {validateReview, validateCampground } = require('./middleware');
+const {validateReview, validateCampground, isLoggedIn} = require('./middleware');
 //kiểm tra kết nối database
 mongoose.connect('mongodb://localhost:27017/yelp-camp');
 
@@ -60,7 +60,7 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 app.use((req, res, next) => {
-    console.log(req.session)
+    console.log(req.session);
     res.locals.currentUser = req.user;
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');

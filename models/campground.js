@@ -19,6 +19,7 @@ const CampgroundSchema = new Schema({
     price: Number, 
     description : String,
     location: String,
+    author : { type: Schema.Types.ObjectId, ref: 'User',},
     reviews : [{ type: Schema.Types.ObjectId, ref: 'Review',}] 
 });
 //delete het may cai review trong dbs khi xoa 1 camgpround.
