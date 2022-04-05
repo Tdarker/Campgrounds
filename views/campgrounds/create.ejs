@@ -2,7 +2,7 @@
 <div class="row">
     <h1 class="text-center">New campground</h1>
     <div class = "col-6 offset-3">
-        <form action="/campgrounds/" method="post" novalidate class="validated-form"> 
+        <form action="/campgrounds/" method="post" novalidate class="validated-form"  enctype="multipart/form-data"> 
             <div class="mb-3">
                 <label  for="title" class="form-label">Title:</label><br>
                 <input  type="text" class="form-control" id="title" name = "campground[title]" required><br>
@@ -24,17 +24,17 @@
                     Please provide a valid location.
                 </div>
             </div>
-
-            //temp
-            <div  class="mb-3">
+            <div class="mb-3">
+            <input type="file" name = 'image' id="" multiple>
+            </div>
+            <!-- <div  class="mb-3">
                 <label class="form-label" for="image">Image URL</label>
                 <input class="input-group" type="text" id="image" name="campground[image]"
                      required>
                 <div class="valid-feedback">
                     Looks good!
                 </div>
-            </div>
-            //
+            </div> -->
             <div class="mb-3">
                 <label class="form-label" for="price">Campground Price</label>
                 <div class="input-group">
@@ -62,7 +62,7 @@
                 </div>
             </div>
                                             <!--     add image           -->
-            <div class="mb-3">
+           <!--  <div class="mb-3">
                 <div class="form-file custom-file">
                     <input type="file" class="form-file-input" id="image" name="image" multiple>
                     <label class="form-file-label" for="image">
@@ -74,7 +74,7 @@
                     Looks good!
                 </div>
                 
-            </div>
+            </div> -->
             <!-- <div class="mb-3">
                 <label class="form-label" for="image">Image Url</label>
                 <input class="form-control" type="text" id="image" name="campground[image]" required>

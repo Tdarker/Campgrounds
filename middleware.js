@@ -41,7 +41,7 @@ module.exports.isReviewAuthor = async (req, res, next) => {
 }
 module.exports.isLoggedIn = (req, res, next) => {
     if (!req.isAuthenticated()) {
-        //nếu chưa đăng nhập lưu  đường dẫn  trước đó 
+        //nếu chưa đăng nhập lưu  đường dẫn  trước đó vào returnto trong session
         req.session.returnTo = req.originalUrl
         req.flash('error', 'You must be signed in first!');
         return res.redirect('/login');
