@@ -1,14 +1,13 @@
 if (process.env.NODE_ENV !== "production") {
     require('dotenv').config();
 }
-
 const express = require('express');
 const app = express();
 const path = require('path');
 const mongoose = require('mongoose');
 const engine = require('ejs-mate');
 const Joi = require('joi');
-const session = require('express-session');
+
 const flash = require('connect-flash');
 const ExpressError = require('./utils/ExpressError');
 const methodOverride = require("method-override");
@@ -16,13 +15,19 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const User = require('./models/user');
 
-
 const campgroundRouters = require('./routers/campground');
 const reviewRouters = require('./routers/review');
 const userRouters = require('./routers/user')
 const {validateReview, validateCampground, isLoggedIn} = require('./middleware');
-//kiểm tra kết nối database
-mongoose.connect('mongodb://localhost:27017/yelp-camp');
+
+const session = require('express-session');
+const MongoDBStore = require('connect-mongo'); 
+const dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/yelp-camp';
+
+
+//kiểm tra kết nối database 
+// 'mongodb://localhost:27017/yelp-camp'
+mongoose.connect( dbUrl);
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
@@ -40,10 +45,21 @@ app.use(methodOverride('_method'));
 app.use(express.static('public'));
 app.use(express.static(path.join(__dirname, 'public')))
 
+const secret = process.env.SECRET || 'thisshouldbeabettersecret!';
+const store = new MongoDBStore({
+    mongoUrl: dbUrl,
+    secret,
+    touchAfter: 24 * 60 * 60
+});
+
+store.on("error", function (e) {
+    console.log("SESSION STORE ERROR", e)
+})
 
 const sessionConfig = {
-    secret : 'thatisnotasecret',
+    store,
     name: 'session',
+    secret,
     resave: false,
     saveUninitialized: true,
     cookie: {

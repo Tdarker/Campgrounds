@@ -3,6 +3,7 @@ const path = require('path');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const ImageSchema = new Schema({
+    //map với multer 
     url: String,
     filename: String
 });
