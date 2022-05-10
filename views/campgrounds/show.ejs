@@ -32,7 +32,7 @@
         <ul class="list-group list-group-flush mb-3">
             <li class="list-group-item text-muted">Khu vực: <%= campground.location%></li>
             <li class="list-group-item">Đăng bởi <%= campground.author.username%></li>
-            <li class="list-group-item">Giá: $<%= campground.price%>/night</li>
+            <li class="list-group-item">Giá: $<%= campground.price%>/ngày</li>
         </ul>
 <!-- delete, update button -->
         <%  if( currentUser && campground.author.equals(currentUser._id)) {%>
@@ -48,53 +48,58 @@
     </div>
     <div class="col-6">
         <% if (currentUser) { %>
-        <h2>Review địa điểm</h2>
-        <form action="/campgrounds/<%=campground._id%>/reviews" method="post" novalidate class="validated-form">
-           <!--  <div class="mb-3">
-                <label class="form-label" for="rating">Rating</label>
-                <input type="range" class="form-range" min="1" max="5" name="review[rating]" id="rating">
-            </div> -->
-            <div class="mb-3">
-                <fieldset class="starability-basic" >
-                    <legend>Đánh giá sao:</legend>
-                    <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
-                    <input type="radio" id="first-rate1" name="review[rating]" value="1" />
-                    <label for="first-rate1" title="Terrible">1 star</label>
-                    <input type="radio" id="first-rate2" name="review[rating]" value="2" />
-                    <label for="first-rate2" title="Not good">2 stars</label>
-                    <input type="radio" id="first-rate3" name="review[rating]" value="3" />
-                    <label for="first-rate3" title="Average">3 stars</label>
-                    <input type="radio" id="first-rate4" name="review[rating]" value="4" />
-                    <label for="first-rate4" title="Very good">4 stars</label>
-                    <input type="radio" id="first-rate5" name="review[rating]" value="5" />
-                    <label for="first-rate5" title="Amazing">5 stars</label>
-                </fieldset>
+        <div class="card mb-3">
+            <div class="card-body" >
+                <h4 class="card-title">Review địa điểm</h4>
+                <form action="/campgrounds/<%=campground._id%>/reviews" method="post" novalidate class="validated-form">
+                <!--  <div class="mb-3">
+                        <label class="form-label" for="rating">Rating</label>
+                        <input type="range" class="form-range" min="1" max="5" name="review[rating]" id="rating">
+                    </div> -->
+                    <div class="mb-3">
+                        <fieldset class="starability-basic" >
+                            <h5>Đánh giá:</h5>
+                            <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
+                            <input type="radio" id="first-rate1" name="review[rating]" value="1" />
+                            <label for="first-rate1" title="Terrible">1 star</label>
+                            <input type="radio" id="first-rate2" name="review[rating]" value="2" />
+                            <label for="first-rate2" title="Not good">2 stars</label>
+                            <input type="radio" id="first-rate3" name="review[rating]" value="3" />
+                            <label for="first-rate3" title="Average">3 stars</label>
+                            <input type="radio" id="first-rate4" name="review[rating]" value="4" />
+                            <label for="first-rate4" title="Very good">4 stars</label>
+                            <input type="radio" id="first-rate5" name="review[rating]" value="5" />
+                            <label for="first-rate5" title="Amazing">5 stars</label>
+                        </fieldset>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="body">Cảm nhận:</label>
+                        <textarea class="form-control" name="review[body]" id="body" cols="30" rows="3" required></textarea>
+                        <div class="valid-feedback">
+                            Hợp lệ!
+                        </div>
+                        <div class="invalid-feedback">
+                            Hãy để lại cảm nhận!
+                        </div> 
+                    </div>
+                    <button type="Gửi" class="btn btn-success">Gửi</button>
+                    <br></br>
+                </form>
             </div>
-            <div class="mb-3">
-                <label class="form-label" for="body">Cảm nhận:</label>
-                <textarea class="form-control" name="review[body]" id="body" cols="30" rows="3" required></textarea>
-                <div class="valid-feedback">
-                Looks good!
-                </div>
-                <div class="invalid-feedback">
-                    Please leave a review.
-                </div> 
-            </div>
-            <button type="submit" class="btn btn-success">Submit</button>
-            <br></br>
-        </form>
+        </div>
     <% } %>
+    <h4>Những lượt review khác:</h3>
     <% for( let review of campground.reviews) { %>
         <div class="card mb-3" >
             <div class="card-body">
-                <h5 class="card-title"><%= review.author.username %></h5>        
+                <h5 class="card-title">Bởi: <%= review.author.username %></h5>        
                 <p class="starability-result" data-rating=<%= review.rating %>>
                     Rated: <%= review.rating %> stars
                 </p>
                 <p class="card-text">Cảm nhận : <%= review.body %> </p>
                 <%  if( currentUser && review.author.equals(currentUser._id))  {%>
                 <form action="/campgrounds/<%=campground._id%>/reviews/<%=review._id%>?_method=DELETE" method="post">
-                    <button class="btn btn-sm btn-danger">Delete</button>
+                    <button class="btn btn-sm btn-danger">Xóa</button>
                 </form>
                 <% } %>
             </div>
