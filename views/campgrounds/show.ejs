@@ -2,6 +2,7 @@
 <link rel="stylesheet" href="/stylesheets/stars.css" class="">
 
 <div class="row">
+<!-- image -->
     <div class="col-6">
         <div id="campgroundCarousel" class="carousel slide" data-ride="carousel">
             <div class="carousel-inner">
@@ -23,18 +24,31 @@
             </a>
             <% } %>
         </div>
+<!-- title, description  -->
+        <div class="card-body">
+            <h5 class="card-title"><%= campground.title%></h5>
+            <p class="card-text"><%= campground.description%></p>
+        </div>
+        <ul class="list-group list-group-flush mb-3">
+            <li class="list-group-item text-muted">Khu vực: <%= campground.location%></li>
+            <li class="list-group-item">Đăng bởi <%= campground.author.username%></li>
+            <li class="list-group-item">Giá: $<%= campground.price%>/night</li>
+        </ul>
+<!-- delete, update button -->
+        <%  if( currentUser && campground.author.equals(currentUser._id)) {%>
         <div class="card mb-3">
             <div class="card-body">
-                <a class="btn btn-primary" href="/campgrounds/<%=campground._id%>/edit" ">Edit</a>
+                <a class="btn btn-primary" href="/campgrounds/<%=campground._id%>/edit" ">Chỉnh sửa</a>
                 <form class="d-inline" action="/campgrounds/<%=campground._id%>?_method=DELETE" method="POST" >  
-                    <button class="btn btn-danger" >Delete</button>
+                    <button class="btn btn-danger" >Xóa</button>
                 </form>
             </div>
         </div> 
+        <% } %>
     </div>
     <div class="col-6">
         <% if (currentUser) { %>
-        <h2>Leave a review</h2>
+        <h2>Review địa điểm</h2>
         <form action="/campgrounds/<%=campground._id%>/reviews" method="post" novalidate class="validated-form">
            <!--  <div class="mb-3">
                 <label class="form-label" for="rating">Rating</label>
@@ -42,7 +56,7 @@
             </div> -->
             <div class="mb-3">
                 <fieldset class="starability-basic" >
-                    <legend>First rating:</legend>
+                    <legend>Đánh giá sao:</legend>
                     <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
                     <input type="radio" id="first-rate1" name="review[rating]" value="1" />
                     <label for="first-rate1" title="Terrible">1 star</label>
@@ -57,7 +71,7 @@
                 </fieldset>
             </div>
             <div class="mb-3">
-                <label class="form-label" for="body">Review text:</label>
+                <label class="form-label" for="body">Cảm nhận:</label>
                 <textarea class="form-control" name="review[body]" id="body" cols="30" rows="3" required></textarea>
                 <div class="valid-feedback">
                 Looks good!
@@ -77,7 +91,7 @@
                 <p class="starability-result" data-rating=<%= review.rating %>>
                     Rated: <%= review.rating %> stars
                 </p>
-                <p class="card-text">Review : <%= review.body %> </p>
+                <p class="card-text">Cảm nhận : <%= review.body %> </p>
                 <%  if( currentUser && review.author.equals(currentUser._id))  {%>
                 <form action="/campgrounds/<%=campground._id%>/reviews/<%=review._id%>?_method=DELETE" method="post">
                     <button class="btn btn-sm btn-danger">Delete</button>

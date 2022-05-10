@@ -34,7 +34,7 @@ module.exports.isReviewAuthor = async (req, res, next) => {
     const { id, reviewId } = req.params;
     const review = await Review.findById(reviewId);
     if (!review.author.equals(req.user._id)) {
-        req.flash('error', 'You do not have permission to do that!');
+        req.flash('error', 'Bạn không có quyền này !');
         return res.redirect(`/campgrounds/${id}`);
     }
     next();
@@ -43,7 +43,7 @@ module.exports.isLoggedIn = (req, res, next) => {
     if (!req.isAuthenticated()) {
         //nếu chưa đăng nhập lưu  đường dẫn  trước đó vào returnto trong session
         req.session.returnTo = req.originalUrl
-        req.flash('error', 'You must be signed in first!');
+        req.flash('error', 'Bạn phải đăng nhập đầu tiên!');
         return res.redirect('/login');
     }
     next();
